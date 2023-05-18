@@ -39,7 +39,7 @@ In the frontend folder
     -> Run the app with npm start
 ```
 
-TestAPI
+## Test API Examples
 
 ```
 http://127.0.0.1:3004/api/integration/request?prompt=Please check what is the ENS associated with the account 0xEf1c6E67703c7BD7107eed8303Fbe6EC2554BF6B
