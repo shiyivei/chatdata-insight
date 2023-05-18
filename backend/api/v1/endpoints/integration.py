@@ -4,12 +4,14 @@ from fastapi.responses import JSONResponse
 
 from services.news import news_api
 from services.binance import binance_api
+from datetime import date,timedelta
 
 from services.conversation.integration import get_judgment_results
 from services.conversation.integration import get_news_prams
 from services.conversation.integration import get_binance_prams
 from services.ethereum.ethereum_info import query_ethereum_info
-from services.ethereum.embedding import train
+from services.conversation.conversation import stream_output
+# from services.ethereum.embedding import train
 
 router = APIRouter()
 
@@ -27,12 +29,12 @@ async def analyze_prompt(
         answer = get_judgment_results(prompt)
 
         if answer["case_number"] == "1":
-            result = query_ethereum_info(prompt)
+                 
+            value = query_ethereum_info(prompt)
 
-            # 定义一个字典
             res = {
             "question_type": "chain_info",
-            "data": result,
+            "data": value,
             }
 
             return res
@@ -44,7 +46,14 @@ async def analyze_prompt(
             symbol = params["symbol"]
             currency="USDT"
             klines=params["k_lines"]
-            dataframe=["2023-05-18", "2023-05-18"]
+
+            today = date.today()
+
+            one_day_ago = today - timedelta(days=1)
+
+            dataframe=[one_day_ago.strftime("%Y-%m-%d"), today.strftime("%Y-%m-%d")]
+
+            print("dataframe:",dataframe)
 
             data = binance_api.get_historical_price(symbol, currency, klines, dataframe)
 

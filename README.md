@@ -52,3 +52,8 @@ http://127.0.0.1:3004/api/integration/request?prompt=What news are there about B
 ```
 http://127.0.0.1:3004/api/integration/request?prompt=How has Bitcoin performed over the past hour?
 ```
+
+```
+http://137.184.5.217:3004/api/integration/request?prompt=What news are there about Bitcoin?
+```
+

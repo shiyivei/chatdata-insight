@@ -40,6 +40,7 @@ class Conversation:
             response = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo",
                 messages=self.messages,
+                # stream=True,
                 temperature=0.5,
                 max_tokens=2048,
                 top_p=1,
@@ -55,3 +56,21 @@ class Conversation:
             del self.messages[1:21] # Remove the first round conversation left.
         return message
     
+
+def stream_output(prompt):
+    response = openai.Completion.create(
+        model="text-davinci-003",
+        prompt=prompt,
+        temperature=0.7,
+        max_tokens=2000,
+        stream=True,
+        top_p=1,
+        stop=["."])
+    return response
+
+    # response = write_a_story_by_stream("汉,冰冻大海,艰难 ->\n")
+
+    # for event in response:
+    #     event_text = event['choices'][0]['text']
+    #     print(event_text, end = '')
+        

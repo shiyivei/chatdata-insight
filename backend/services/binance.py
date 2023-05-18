@@ -30,7 +30,13 @@ class BinanceAPI:
         # Convert start and end time strings to datetime objects
         try:
             start_time = datetime.fromisoformat(time_range[0].strip())
+
+            print("start_time:",start_time)
+        
             end_time = datetime.fromisoformat(time_range[1].strip())
+            
+            print("end_time:",end_time)
+
         except (ValueError, TypeError, IndexError):
             # Use default values if time_range is invalid or None
             start_time = self.start_dt

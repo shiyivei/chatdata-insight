@@ -110,8 +110,6 @@ def get_binance_prams(x):
 
     model = OpenAI(temperature=0)
 
-    print("user request------:",x)
-
     _input = prompt.format_prompt(question=x)
     output = model(_input.to_string())
     result = output_parser.parse(output)
