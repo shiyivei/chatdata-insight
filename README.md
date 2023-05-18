@@ -14,7 +14,7 @@ You need a mongodb account.
     DB_NAME = "PolarDashApp"
     COLLECTION_NAME = "polardash"
 
-``` 
+```
 
 ## Setup backend
 
@@ -37,7 +37,18 @@ In the frontend folder
     -> npm install react-router-dom
 
     -> Run the app with npm start
-
-
 ```
 
+TestAPI
+
+```
+http://127.0.0.1:3004/api/integration/request?prompt=Please check what is the ENS associated with the account 0xEf1c6E67703c7BD7107eed8303Fbe6EC2554BF6B
+```
+
+```
+http://127.0.0.1:3004/api/integration/request?prompt=What news are there about Bitcoin?
+```
+
+```
+http://127.0.0.1:3004/api/integration/request?prompt=How has Bitcoin performed over the past hour?
+```

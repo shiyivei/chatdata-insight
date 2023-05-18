@@ -1,3 +1,10 @@
+import os
+import sys
+current_directory = os.path.dirname(os.path.realpath(__file__))
+root_directory = os.path.abspath(os.path.join(current_directory, '..', '..', '..'))
+
+sys.path.insert(0, root_directory)
+
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 from typing import List
@@ -7,6 +14,9 @@ from fastapi.responses import JSONResponse
 
 from api.v1.models.openai import ChatDB
 from services.openai import get_completion
+
+
+
 
 
 router = APIRouter()
@@ -19,6 +29,7 @@ router = APIRouter()
         response_description="List complete chat history",
         responses={404: {"description": "Not found"}}
 )
+
 async def list_chat_completion_history (request: Request, skip: int = 0, limit: int = 100) -> List[ChatDB]:
     try:
         projection = {"_id": 1, "prompt": 1, "completion": 1, "created_at": 1 }
@@ -30,8 +41,6 @@ async def list_chat_completion_history (request: Request, skip: int = 0, limit: 
 
     except Exception as e:
         return JSONResponse(status_code=400, content={"message": str(e)})
-    
-
 
 # --------------- POST ----------------- # 
 @router.post(
