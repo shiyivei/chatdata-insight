@@ -53,6 +53,10 @@ async def analyze_prompt(
 
             dataframe=[one_day_ago.strftime("%Y-%m-%d"), today.strftime("%Y-%m-%d")]
 
+
+            print("symbol:",symbol)
+            print("currency:",currency)
+            print("currency:",klines)
             print("dataframe:",dataframe)
 
             data = binance_api.get_historical_price(symbol, currency, klines, dataframe)
