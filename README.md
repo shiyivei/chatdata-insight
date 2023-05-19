@@ -57,3 +57,7 @@ http://127.0.0.1:3004/api/integration/request?prompt=How has Bitcoin performed o
 http://137.184.5.217:3004/api/integration/request?prompt=What news are there about Bitcoin?
 ```
 
+```
+resp = requests.get('https://api.binance.us/api/v3/klines?symbol=LTCBTC&interval=1m')
+```
+

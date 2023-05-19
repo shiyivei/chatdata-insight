@@ -45,7 +45,9 @@ async def analyze_prompt(
 
             symbol = params["symbol"]
             currency="USDT"
-            klines=params["k_lines"]
+
+            # klines=params["k_lines"]
+            klines="1h"
 
             today = date.today()
 
@@ -56,7 +58,7 @@ async def analyze_prompt(
 
             print("symbol:",symbol)
             print("currency:",currency)
-            print("currency:",klines)
+            print("interval:",klines)
             print("dataframe:",dataframe)
 
             data = binance_api.get_historical_price(symbol, currency, klines, dataframe)
