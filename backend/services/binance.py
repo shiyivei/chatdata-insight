@@ -8,7 +8,8 @@ from requests.exceptions import RequestException
 
 class BinanceAPI:
     def __init__(self):
-        self.base_url = "https://api.binance.com/api/v3"
+        # self.base_url = "https://api.binance.com/api/v3"
+        self.base_url = "https://api.binance.us/api/v3"
     
         # Start with past midnight today
         self.end_dt = datetime.today()
@@ -34,7 +35,7 @@ class BinanceAPI:
             print("start_time:",start_time)
         
             end_time = datetime.fromisoformat(time_range[1].strip())
-            
+
             print("end_time:",end_time)
 
         except (ValueError, TypeError, IndexError):
