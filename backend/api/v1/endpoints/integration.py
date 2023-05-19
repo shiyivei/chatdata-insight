@@ -45,7 +45,7 @@ async def analyze_prompt(
 
             symbol = params["symbol"]
             currency="USDT"
-            klines=params["k_lines"]
+            klines="2h"#klines=params["k_lines"]
 
             today = date.today()
 
