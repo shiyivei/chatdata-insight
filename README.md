@@ -41,23 +41,27 @@ In the frontend folder
 
 ## Test API Examples
 
+### 1 Query on-chain information
+
 ```
-http://127.0.0.1:3004/api/integration/request?prompt=Please check what is the ENS associated with the account 0xEf1c6E67703c7BD7107eed8303Fbe6EC2554BF6B
+Please check what is the ENS associated with the account 0xEf1c6E67703c7BD7107eed8303Fbe6EC2554BF6B
 ```
 
 ```
-http://127.0.0.1:3004/api/integration/request?prompt=What news are there about Bitcoin?
+Can you help me examine the details of this contract: 0xf2A22B900dde3ba18Ec2AeF67D4c8C1a0DAB6aAC?
 ```
 
-```
-http://127.0.0.1:3004/api/integration/request?prompt=How has Bitcoin performed over the past hour?
-```
+### 2 Query transaction data
 
 ```
-http://137.184.5.217:3004/api/integration/request?prompt=What news are there about Bitcoin?
+How has Bitcoin performed over the past hour?
 ```
 
+### 3 Query media news
+
 ```
-http://137.184.5.217:3004/api/integration/request?prompt=can you help me examine the details of this contract: 0xf2A22B900dde3ba18Ec2AeF67D4c8C1a0DAB6aAC?
+What news are there about Bitcoin?
 ```
+
+
 
