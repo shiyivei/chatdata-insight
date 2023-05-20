@@ -43,7 +43,7 @@ async def analyze_prompt(
 
         elif answer["case_number"] == "2":
                  
-            params = get_binance_prams(prompt)
+            params = get_binance_prams(prompt
 
             symbol = params["symbol"]
             currency="USDT"
