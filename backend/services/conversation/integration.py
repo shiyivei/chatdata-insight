@@ -5,7 +5,7 @@ import os
 import sys
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
-backend_directory = os.path.abspath(os.path.join(current_directory))
+backend_directory = os.path.abspath(os.path.join(current_directory,"..",".."))
 sys.path.insert(0, backend_directory)
 
 # sys.path.insert(0, '/Users/qinjianquan/Career/redstone-network/chatdata-insight/backend')
@@ -13,11 +13,16 @@ sys.path.insert(0, backend_directory)
 from core.config import Config
 openai.api_key = Config.OPENAI_API_KEY
 
+# print("----root_directory:",backend_directory)
+# print("----openai_api_key:",Config.OPENAI_API_KEY)
+
 # openai.api_key = os.environ.get("OPENAI_API_KEY")
 
 COMPLETION_MODEL = "gpt-3.5-turbo"
 
 PROMPT = Config.JUDGEMENT_PROMPT
+
+# print("----prompt:",Config.JUDGEMENT_PROMPT)
 
 # 创建一个函数，名为 get_tour_advice(prompt)
 def get_judgment_results0(prompt):
@@ -62,6 +67,8 @@ def get_judgment_results(x):
     _input = prompt.format_prompt(question=x)
     output = model(_input.to_string())
     result = output_parser.parse(output)
+
+    print("judge result:",result)
 
     return result
 

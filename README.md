@@ -58,6 +58,6 @@ http://137.184.5.217:3004/api/integration/request?prompt=What news are there abo
 ```
 
 ```
-resp = requests.get('https://api.binance.us/api/v3/klines?symbol=LTCBTC&interval=1m')
+http://137.184.5.217:3004/api/integration/request?prompt=can you help me examine the details of this contract: 0xf2A22B900dde3ba18Ec2AeF67D4c8C1a0DAB6aAC?
 ```
 

@@ -57,20 +57,17 @@ class Conversation:
         return message
     
 
+
+from langchain.chat_models import ChatOpenAI
+from langchain.schema import (
+    HumanMessage,
+)
+
+from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
+
 def stream_output(prompt):
-    response = openai.Completion.create(
-        model="text-davinci-003",
-        prompt=prompt,
-        temperature=0.7,
-        max_tokens=2000,
-        stream=True,
-        top_p=1,
-        stop=["."])
-    return response
+         
+    chat = ChatOpenAI(streaming=True, callbacks=[StreamingStdOutCallbackHandler()], temperature=0)
+    return chat([HumanMessage(content=prompt)])
 
-    # response = write_a_story_by_stream("汉,冰冻大海,艰难 ->\n")
-
-    # for event in response:
-    #     event_text = event['choices'][0]['text']
-    #     print(event_text, end = '')
-        
+    

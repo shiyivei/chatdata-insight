@@ -10,7 +10,7 @@ from services.conversation.integration import get_judgment_results
 from services.conversation.integration import get_news_prams
 from services.conversation.integration import get_binance_prams
 from services.ethereum.ethereum_info import query_ethereum_info
-from services.conversation.conversation import stream_output
+# from services.conversation.conversation import stream_output
 # from services.ethereum.embedding import train
 
 router = APIRouter()
@@ -37,7 +37,9 @@ async def analyze_prompt(
             "data": value,
             }
 
-            return res
+            # return res
+            return value
+
 
         elif answer["case_number"] == "2":
                  
@@ -83,7 +85,7 @@ async def analyze_prompt(
             }
 
             return res
-
+           
         else:
             
             print("case_number:",answer["case_number"])
