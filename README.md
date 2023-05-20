@@ -1,5 +1,5 @@
 
-# PolarDash FARM-Stack APP
+# ChatdataInsight APP
 
 Application built with FastAPI, React, and MongoDB. 
 

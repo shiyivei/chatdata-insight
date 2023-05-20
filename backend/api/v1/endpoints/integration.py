@@ -42,27 +42,18 @@ async def analyze_prompt(
 
 
         elif answer["case_number"] == "2":
-                 
             params = get_binance_prams(prompt)
 
             symbol = params["symbol"]
             currency="USDT"
-
-            # klines=params["k_lines"]
-            klines="1h"
-
-            today = date.today()
-
-            one_day_ago = today - timedelta(days=1)
-
-            dataframe=[one_day_ago.strftime("%Y-%m-%d"), today.strftime("%Y-%m-%d")]
-
+            klines= params["k_lines"]
+            dataframe = params["dataframe"]
 
             print("symbol:",symbol)
             print("currency:",currency)
-            print("interval:",klines)
+            print("klines:",klines)
             print("dataframe:",dataframe)
-
+            
             data = binance_api.get_historical_price(symbol, currency, klines, dataframe)
 
             res = {
