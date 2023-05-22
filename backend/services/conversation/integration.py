@@ -11,12 +11,13 @@ sys.path.insert(0, backend_directory)
 # sys.path.insert(0, '/Users/qinjianquan/Career/redstone-network/chatdata-insight/backend')
 
 from core.config import Config
-openai.api_key = Config.OPENAI_API_KEY
+openai.api_key = Config.OPENAIAPI_KEY
 
-# print("----root_directory:",backend_directory)
-# print("----openai_api_key:",Config.OPENAI_API_KEY)
+print("----root_directory:",backend_directory)
 
 # openai.api_key = os.environ.get("OPENAI_API_KEY")
+
+print("----openai_api_key:",openai.api_key)
 
 COMPLETION_MODEL = "gpt-3.5-turbo"
 

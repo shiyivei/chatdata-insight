@@ -1,7 +1,8 @@
 from decouple import config
 
 class Config:
-    OPENAI_API_KEY = config("OPENAI_API_KEY", cast=str)
+         
+    OPENAIAPI_KEY = config("OPENAIAPI_KEY", cast=str)
     PROMPT_FILE = config("PROMPT_FILE", cast=str)
     COIN_SYMBOLS = config("COIN_SYMBOLS", cast=str)
     # PROMPT_FILE_KAHIN = config("PROMPT_FILE_KAHIN", cast=str)

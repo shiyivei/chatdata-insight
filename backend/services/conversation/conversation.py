@@ -10,8 +10,7 @@ sys.path.insert(0, backend_directory)
 # sys.path.insert(0, '/Users/qinjianquan/Career/redstone-network/chatdata-insight/backend')
 
 from core.config import Config
-openai.api_key = Config.OPENAI_API_KEY
-# openai.api_key = os.getenv("OPENAI_API_KEY")
+openai.api_key = Config.OPENAIAPI_KEY
 
 def conversation(prompt):
      
