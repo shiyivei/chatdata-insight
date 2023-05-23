@@ -16,7 +16,7 @@ from typing import List, Tuple
 
 from core.config import Config
 
-openai.api_key = Config.OPENAIAPI_KEY
+openai.api_key = Config.OPENAI_API_KEY
 
 _df = pd.read_csv(Config.COIN_SYMBOLS)
 

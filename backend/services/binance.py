@@ -63,7 +63,7 @@ class BinanceAPI:
             # Make request to API endpoint with specified parameters
             r = requests.get(f'{self.base_url}/klines?symbol={symbol}{currency}&interval={interval}&startTime={start_timestamp}&endTime={end_timestamp}&limit=3000')
             content = json.loads(r.content)
-            print("content:",content)
+            # print("content:",content)
         
         except RequestException as e:
             

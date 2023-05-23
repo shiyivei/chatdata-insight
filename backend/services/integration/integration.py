@@ -8,45 +8,19 @@ current_directory = os.path.dirname(os.path.realpath(__file__))
 backend_directory = os.path.abspath(os.path.join(current_directory,"..",".."))
 sys.path.insert(0, backend_directory)
 
-# sys.path.insert(0, '/Users/qinjianquan/Career/redstone-network/chatdata-insight/backend')
-
 from core.config import Config
-openai.api_key = Config.OPENAIAPI_KEY
 
-print("----root_directory:",backend_directory)
-
-# openai.api_key = os.environ.get("OPENAI_API_KEY")
-
-print("----openai_api_key:",openai.api_key)
+os.environ["OPENAI_API_KEY"] = Config.OPENAI_API_KEY
 
 COMPLETION_MODEL = "gpt-3.5-turbo"
 
-PROMPT = Config.JUDGEMENT_PROMPT
-
-# print("----prompt:",Config.JUDGEMENT_PROMPT)
-
-# 创建一个函数，名为 get_tour_advice(prompt)
-def get_judgment_results0(prompt):
-    # 调用 OpenAI API 来生成文本，使用指定的模型和输入文本
-    completions = openai.Completion.create (
-        engine=COMPLETION_MODEL,
-        prompt=prompt,
-        max_tokens=512,
-        n=1,
-        stop=None,
-        temperature=0.0,        
-    )
-    # 从 API 响应中获取文本输出结果
-    message = completions.choices[0].text
-    # 返回文本输出结果
-    return message
-
-
+JUDGEMENT_PROMPT = Config.JUDGEMENT_PROMPT
 
 from langchain.output_parsers import StructuredOutputParser, ResponseSchema
 from langchain.prompts import PromptTemplate, ChatPromptTemplate, HumanMessagePromptTemplate
-from langchain.llms import OpenAI
 from langchain.chat_models import ChatOpenAI
+from langchain.llms import OpenAI
+
 
 def get_judgment_results(x):
     response_schemas = [
@@ -58,7 +32,7 @@ def get_judgment_results(x):
     format_instructions = output_parser.get_format_instructions()
 
     prompt = PromptTemplate(
-        template=PROMPT+"\n{format_instructions}\n{question}",
+        template=JUDGEMENT_PROMPT+"\n{format_instructions}\n{question}",
         input_variables=["question"],
         partial_variables={"format_instructions": format_instructions}
     )
@@ -69,36 +43,40 @@ def get_judgment_results(x):
     output = model(_input.to_string())
     result = output_parser.parse(output)
 
-    print("judge result:",result)
+    print("INFO:     Judge Result:", result)
 
     return result
 
-PROMPT = """ You need to obtain the key query parameters based on user input. For example, in the question 'What news are there about Bitcoin?', the key parameter is 'Bitcoin'."""
+NEWS_PROMPT = Config.NEWS_PROMPT
+
+# print("news prompt:",NEWS_PROMPT)
 
 def get_news_prams(x):
 
     response_schemas = [
-        ResponseSchema(name="token_name", description="token_name represents the query parameters extracted from the user input. For example, in the sentence 'What news are there about Bitcoin?', the query parameter would be 'Bitcoin'.")
+        ResponseSchema(name="key_word", description="key_word represents the query parameters extracted from the user input. For example, in the sentence 'What news are there about Bitcoin?', the query parameter would be 'Bitcoin'.")
     ]
     output_parser = StructuredOutputParser.from_response_schemas(response_schemas)
 
     format_instructions = output_parser.get_format_instructions()
 
     prompt = PromptTemplate(
-        template=PROMPT+"\n{format_instructions}\n{question}",
+        template=NEWS_PROMPT+"\n{format_instructions}\n{question}",
         input_variables=["question"],
         partial_variables={"format_instructions": format_instructions}
     )
 
     model = OpenAI(temperature=0)
 
-    print("user request:",x)
-
     _input = prompt.format_prompt(question=x)
     output = model(_input.to_string())
     result = output_parser.parse(output)
 
+    print("INFO:     News prams:", result)
+
     return result
+
+BINANCE_PROMPT = Config.BINANCE_PROMPT
 
 def get_binance_prams(x):
 
@@ -112,7 +90,7 @@ def get_binance_prams(x):
     format_instructions = output_parser.get_format_instructions()
 
     prompt = PromptTemplate(
-        template=PROMPT+"\n{format_instructions}\n{question}",
+        template=BINANCE_PROMPT+"\n{format_instructions}\n{question}",
         input_variables=["question"],
         partial_variables={"format_instructions": format_instructions}
     )
@@ -122,5 +100,7 @@ def get_binance_prams(x):
     _input = prompt.format_prompt(question=x)
     output = model(_input.to_string())
     result = output_parser.parse(output)
+
+    print("INFO:     BINANCE PRAMS:", result)
 
     return result
