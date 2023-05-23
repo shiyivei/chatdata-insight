@@ -52,4 +52,4 @@ app.include_router(news.router)
 app.include_router(integration.router)
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", reload=True, host='127.0.0.1', port=3005)
+    uvicorn.run("main:app", reload=True, host='127.0.0.1', port=3004)
