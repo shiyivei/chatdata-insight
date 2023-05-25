@@ -25,6 +25,7 @@ app = FastAPI()
 origins = [
     "http://localhost:3000",
     "http://137.184.5.217",
+    "http://demo.chatdatainsight.com",
 ]
 
 # Add CORS middleware
@@ -52,4 +53,4 @@ app.include_router(news.router)
 app.include_router(integration.router)
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", reload=True, host='127.0.0.1', port=3004)
+    uvicorn.run("main:app", reload=True, host='0.0.0.0', port=3004)
