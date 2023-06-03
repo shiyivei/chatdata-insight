@@ -17,8 +17,8 @@ sys.path.insert(0, backend_directory)
 
 from core.config import Config
 
-from services.integration.conversation import conversation
-from services.integration.conversation import stream_output
+from services.helpers.chat_models import conversation
+from services.helpers.chat_models import stream_output
 
 prompted = False  # Used to determine if ChatGPT has already been prompted
 

@@ -19,3 +19,5 @@ def train():
       index = GPTVectorStoreIndex.from_documents(documents)
       index.storage_context.persist(persist_dir='services/ethereum/static/ethereum_index')
 
+      
+

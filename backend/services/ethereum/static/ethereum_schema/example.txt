@@ -126,3 +126,49 @@ query Query($address: String!) {
 variables = {
     "address": "0x668e8A0DB87FA6ce64B2e13eD12a3981f59ef418"
 }
+
+example 5: 
+
+questions: 
+
+What are the different types of tokens for this address: 0xDA9dfA130Df4dE4673b89022EE50ff26f6EA73Cf?
+
+answer: 
+
+query Transactions($address: String!) {
+  ethereum {
+    walletByAddress(address: $address) {
+      tokenBalances {
+        totalCount
+      }
+    }
+  }
+}
+
+            
+variables = {
+    "address": "0xDA9dfA130Df4dE4673b89022EE50ff26f6EA73Cf",
+}
+
+example 5: 
+
+questions: 
+
+What are the different types of tokens for this address: 0xDA9dfA130Df4dE4673b89022EE50ff26f6EA73Cf?
+
+answer: 
+
+query Transactions($address: String!) {
+  ethereum {
+    walletByAddress(address: $address) {
+      tokenBalances {
+        totalCount
+      }
+    }
+  }
+}
+
+            
+variables = {
+    "address": "0xDA9dfA130Df4dE4673b89022EE50ff26f6EA73Cf",
+}
