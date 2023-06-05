@@ -53,5 +53,5 @@ app.include_router(integration.router)
 app.include_router(train.router)
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", reload=True, host='127.0.0.1', port=3004) # production
-    # uvicorn.run("main:app", reload=True, host='0.0.0.0', port=3005) # developm 
+    # uvicorn.run("main:app", reload=True, host='127.0.0.1', port=3004) # production
+    uvicorn.run("main:app", reload=True, host='0.0.0.0', port=3005) # development
