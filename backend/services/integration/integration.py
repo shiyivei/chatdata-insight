@@ -3,6 +3,7 @@ import openai
 import os
 
 import sys
+import json
 from fastapi import HTTPException
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
@@ -205,15 +206,24 @@ def search_onchain_info(intput: str) -> str:
     return res
 
 
-def chatdata_agent(question):
+def chatdata_agent(origin_question):
 
-    question_dict = task_decomposition(question)
+    try:
+        answer_dict = task_decomposition(origin_question)
+    except Exception as e:
+        print(f"ERROR:     Error occurred during task decomposition: {e}")
+        return None
 
-    res = result_integration(question_dict)
+    try:
+        result = result_integration(origin_question,answer_dict)
+    except Exception as e:
+        print(f"ERROR:     Error occurred during result integration: {e}")
+        return None
 
     print("INFO:     Agent Result:", result)
 
     return result
+
 
 
 # task decomposition
@@ -251,8 +261,6 @@ def task_decomposition(question):
 
     return result
     
-
-
 
 # solution selection
 
@@ -308,52 +316,64 @@ def solution_selection(question):
 
 # result integration
 
-def result_integration(question_dict,origin_question):
+RESULT_INTEGRATION_PROMPT = "Assume you are a master summarizer. We have broken down the {origin_question} into multiple sub-questions and got the corresponding answers as {ans_dict}. Now, we need you to make a summary for the user based on these answers and the original question."
+
+def result_integration(origin_question,answer_dict):
+
+    if not isinstance(answer_dict, dict):
+        print("ERROR:     answer_dict must be a dictionary")
+        return None
+
+    if not isinstance(origin_question, str):
+        print("ERROR:     origin_question must be a string")
+        return None
 
     ans_dict = {}
 
-    for key, value in dict.items():
-        if value == 'none':
-            break
-        else:
-            print(f'Key: {key}, Value: {value}')
-            new_key = value
-            new_value = solution_selection(value)
+    try:
+        for key, value in answer_dict.items():
+            if value == 'none':
+                break
+            else:
+                print(f'INFO:     Key: {key}, Value: {value}')
+                new_key = value
+                try:
+                    new_value = solution_selection(value)
+                except Exception as e:
+                    print(f"ERROR:     Error occurred while executing solution_selection: {e}")
+                    continue
+                ans_dict[new_key] = new_value
+    except Exception as e:
+        print(f"ERROR:     Error occurred during processing answer_dict: {e}")
+        return None
 
-            ans_dict[new_key] = new_value
+    try:
+        multiple_input_prompt = PromptTemplate(
+        input_variables=["origin_question", "ans_dict"], 
+        template=RESULT_INTEGRATION_PROMPT
+        )
+    except Exception as e:
+        print(f"ERROR:     Error occurred during the creation of PromptTemplate: {e}")
+        return None
 
+    try:
+        _input=multiple_input_prompt.format(origin_question=origin_question, ans_dict=ans_dict)
+    except Exception as e:
+        print(f"ERROR:     Error occurred during the formatting of PromptTemplate: {e}")
+        return None
 
-    prompt = "Assume you are a master summarizer. We have broken down the original question into multiple sub-questions and found the corresponding answers. Now, we need you to make a summary for the user based on these answers and the original question."
+    print("INFO:     MULTIPLE INPUT:", _input)
 
+    try:
+        model = OpenAI(temperature=0)
+    except Exception as e:
+        print(f"ERROR:     Error occurred while creating OpenAI model: {e}")
+        return None
 
-    query_res = "The sub-questions and their answers are:"
-
-    for key, value in ans_dict.items():
-        
-        query_res = key + ":" + value + ";"
-
-    entire_question = prompt + query_res + origin_question
-
-
-    llm = OpenAI(temperature=0.9)
-   
-    res = llm(entire_question)
+    try:
+        res = model(_input)
+    except Exception as e:
+        print(f"ERROR:     Error occurred while processing input with the OpenAI model: {e}")
+        return None
 
     return res
-
-
-    
-
-
-    
-
-
-
-
-
-
-
-
-
-
-
