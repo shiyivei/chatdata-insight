@@ -127,6 +127,8 @@ def get_binance_prams(x):
 
 def search_on_internet(question: str) -> str:
 
+    insert_error_data(question, "", "can not find answer")
+
     os.environ["GOOGLE_CSE_ID"] = "6170c8edfbf634caf"
     os.environ["GOOGLE_API_KEY"] = "AIzaSyDnFWoQElznz9N5frGoVsOuNP55xBBV6zM"
 

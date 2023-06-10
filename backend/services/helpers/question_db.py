@@ -9,9 +9,9 @@ class Data(BaseModel):
     error: Optional[str] = None
 
 # insert data
-async def insert_error_data(question: str, error: str):
+async def insert_error_data(question: str, answer: str, error: str):
     collection = app.mongodb["chatadata-insight-collection"]  
-    data = Data(question=question, error=error)
+    data = Data(question=question, answer=answer, error=error)
     data_dict = data.dict()
     result = await collection.insert_one(data_dict)
     if result:
