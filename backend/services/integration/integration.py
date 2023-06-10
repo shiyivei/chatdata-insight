@@ -6,9 +6,15 @@ import sys
 import json
 from fastapi import HTTPException
 
+import mplfinance as mpf
+import pandas as pd
+
 current_directory = os.path.dirname(os.path.realpath(__file__))
 backend_directory = os.path.abspath(os.path.join(current_directory,"..",".."))
 sys.path.insert(0, backend_directory)
+
+# current_directory = os.getcwd()
+# print(current_directory)
 
 from core.config import Config
 from services.binance import binance_api
@@ -198,15 +204,42 @@ def search_price_info(intput: str) -> str:
         logger.error("ERROR:    Getting historical price from Binance failed: %s", str(e))
         raise HTTPException(status_code=200, detail=str(e))
 
+
+    print("GET BINANCE DATA:",data)
+    
+    # 将数据转换为DataFrame格式
+    df = pd.DataFrame(data)
+    # 转换为浮点数
+    df['open'] = df['open'].astype(float)
+    df['high'] = df['high'].astype(float)
+    df['low'] = df['low'].astype(float)
+    df['close'] = df['close'].astype(float)
+    df['volume'] = df['volume'].astype(float)
+    df['quote_asset_volume'] = df['quote_asset_volume'].astype(float)
+    df['taker_buy_base_asset_volume'] = df['taker_buy_base_asset_volume'].astype(float)
+    df['taker_buy_quote_asset_volume'] = df['taker_buy_quote_asset_volume'].astype(float)
+
+    # 转换为整数
+    df['num_trades'] = df['num_trades'].astype(int)
+    df['open_time'] = pd.to_datetime(df['open_time'])
+    df.set_index('open_time', inplace=True)
+
+    # 绘制蜡烛图
+    image_path = 'static/image/candlestick_chart.png'
+    mpf.plot(df, type='candle', style='yahoo', volume=True, savefig=image_path)
+
+    # 你需要将下面的 URL 替换成你的应用服务器的地址
+    image_url = f'http://137.184.5.217:3005/{image_path}'
+
     res = {
         "question_type": "binance_data",
         "data": data,
+        "image_link": image_url
     }
-
 
     print("binance data:",res)
 
-    return res
+    return
 
 
 
@@ -292,7 +325,7 @@ def search_internet_info(input: str) -> str:
 
 # solution selection
 
-def solution_selection(question):
+def solution_selection(question: str):
 
 
     llm = OpenAI(temperature=0)
@@ -336,6 +369,8 @@ def solution_selection(question):
 
     agent = initialize_agent(tools, llm, agent="zero-shot-react-description",max_iterations=3, verbose=True)
     result = agent.run(question)
+
+    
 
     print("INFO:     Agent Result:", result)
 

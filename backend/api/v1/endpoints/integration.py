@@ -43,7 +43,7 @@ async def analyze_prompt(prompt: str):
         res = {
                 "question_type": "chain_info",
                 "data": value,
-                "image_link":""
+                "image_link":"http://137.184.5.217:3005/static/image/candlestick_chart.png"
             }
         return res
 
@@ -65,9 +65,4 @@ async def analyze_prompt(prompt: str):
 
 
         
-
-
-
-        
-
 

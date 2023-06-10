@@ -1,5 +1,7 @@
 import uvicorn
 import certifi
+import os
+import sys
 
 from decouple import config
 from fastapi import FastAPI, APIRouter
@@ -13,11 +15,25 @@ from api.v1.endpoints import news
 from api.v1.endpoints import integration
 from api.v1.endpoints import train
 
+from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+
+# current_directory = os.path.dirname(os.path.realpath(__file__))
+# backend_directory = os.path.abspath(os.path.join(current_directory,".."))
+# sys.path.insert(0, backend_directory)
+
+# current_directory = os.getcwd()
+# print(current_directory)
+
+# print(os.getcwd())
+
+app = FastAPI()
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+
 DB_URL = config("DB_URL", cast=str)
 DB_NAME = config("DB_NAME", cast=str)
 
-
-app = FastAPI()
 
 origins = [
     "http://localhost:3000",
