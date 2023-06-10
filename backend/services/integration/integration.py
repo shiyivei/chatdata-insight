@@ -30,6 +30,7 @@ from langchain.prompts import PromptTemplate, ChatPromptTemplate, HumanMessagePr
 from langchain.chat_models import ChatOpenAI
 from langchain.llms import OpenAI
 from langchain.agents import initialize_agent, Tool
+from langchain.utilities import GoogleSearchAPIWrapper
 
 JUDGEMENT_PROMPT = Config.JUDGEMENT_PROMPT
 
@@ -118,9 +119,23 @@ def get_binance_prams(x):
 
 
 
-def search_team_info(input: str) -> str:
+def search_on_internet(question: str) -> str:
+
+    os.environ["GOOGLE_CSE_ID"] = "6170c8edfbf634caf"
+    os.environ["GOOGLE_API_KEY"] = "AIzaSyDnFWoQElznz9N5frGoVsOuNP55xBBV6zM"
+
+
+    search = GoogleSearchAPIWrapper()
+
+    tool = Tool(
+        name = "Google Search",
+        description="Search Google for recent results.",
+        func=search.run
+    )
+
+    res = tool.run(question)
     
-    return "LDO背后是个大团队"
+    return res
 
 def analyze_community_activity(input: str) -> str:
     try:
@@ -284,8 +299,8 @@ def solution_selection(question):
 
     tools = [
         Tool(
-            name = "Search for startup team information",func=search_team_info, 
-            description="useful for when you need to answer questions about the founders or startup team information of a project"
+            name = "Search something on internet",func=search_on_internet, 
+            description="useful for when you need to search for information on the internet."
         ),
         Tool(name="Analyze community activity", func=analyze_community_activity, 
             description="useful for when you need to answer questions about the community activity or social media activity of a specific project"

@@ -28,6 +28,7 @@ from langchain.prompts import PromptTemplate, ChatPromptTemplate, HumanMessagePr
 from langchain.chat_models import ChatOpenAI
 from langchain.llms import OpenAI
 from langchain.agents import initialize_agent, Tool
+from langchain.utilities import GoogleSearchAPIWrapper
 
 # extract params from question
 
@@ -39,31 +40,51 @@ Another question:'Check the recent transfer records of this account 0xEf1c6E6770
 
 '''
 
-def get_query_params(x):
-    response_schemas = [
-      ResponseSchema(name="question", description="question is the problem itself.for example,'Check the recent transfer records of this account 0xEf1c6E67703c7BD7107eed8303Fbe6EC2554BF6B.',would be 'Check the recent transfer records of this account 0xEf1c6E67703c7BD7107eed8303Fbe6EC2554BF6B.'"),
-      ResponseSchema(name="params", description="The parameter extracted from the question, for instance 'can you check the balance of this address 0x60e4d786628fea6478f785a6d7e704777c86a7c6?', would be '0x60e4d786628fea6478f785a6d7e704777c86a7c6'.")
-    ]
-    output_parser = StructuredOutputParser.from_response_schemas(response_schemas)
+def test_openai_api():
+    
+    llm = OpenAI(temperature=0)
 
-    format_instructions = output_parser.get_format_instructions()
+    text = f""" The kitten and the puppy are good friends.\
+    They often play, explore, and enjoy beautiful moments together.\
+    Every day, they chase butterflies and leap on the green grass.\
+    The kitten teaches the puppy how to catch mice, while the puppy leads the kitten to explore the forest.\
+    They help and care for each other.\
+    Whether it's sunny or rainy, they are always together.\
+    People are often touched by the deep friendship between them.\
+    The story of the kitten and the puppy is a wonderful melody about friendship and cooperation, echoing in our hearts forever.
+    """
 
-    prompt = PromptTemplate(
-        template=JUDGEMENT_PROMPT+"\n{format_instructions}\n{question}",
-        input_variables=["question"],
-        partial_variables={"format_instructions": format_instructions}
+    prompt = f"""
+    Summarize the text delimited by triple backtricks \ 
+    into a single sentence.
+    ```{text}```
+    """
+
+
+    print("INFO:     Judge Result:", llm(prompt))
+
+
+# test_openai_api()
+
+def search_on_internet(question: str) -> str:
+
+    os.environ["GOOGLE_CSE_ID"] = "6170c8edfbf634caf"
+    os.environ["GOOGLE_API_KEY"] = "AIzaSyDnFWoQElznz9N5frGoVsOuNP55xBBV6zM"
+
+
+    search = GoogleSearchAPIWrapper()
+
+    tool = Tool(
+        name = "Google Search",
+        description="Search Google for recent results.",
+        func=search.run
     )
 
-    model = OpenAI(temperature=0)
+    res = tool.run(question)
 
-    _input = prompt.format_prompt(question=x)
-    output = model(_input.to_string())
-    result = output_parser.parse(output)
-
-    print("INFO:     Judge Result:", result)
-
-    return result
+    print("search results:",res)
+    
+    return res
 
 
-question = "Check the recent transfer records of this account 0xEf1c6E67703c7BD7107eed8303Fbe6EC2554BF6B."
-get_query_params(question)
+# search_on_internet("Bitcoin")
