@@ -2,6 +2,7 @@
 from fastapi import APIRouter
 from fastapi import HTTPException
 from services.integration.integration import chatdata_agent
+from services.integration.integration import check_results
 
 
 router = APIRouter()
@@ -15,8 +16,37 @@ router = APIRouter()
 async def analyze_prompt(prompt: str):
     
     try:
-        res = chatdata_agent(prompt)
+        value = chatdata_agent(prompt)
+
+        # v = check_results(value)
+
+        # if v["validity"] == 'yes':
+
+        #     res = {
+        #         "question_type": "",
+        #         "data": value,
+        #         "image_link":""
+        #     }
+        #     return res
+        # else: 
+
+        #     user_message = "We appreciate your question! Sadly, our system isn't able to provide an answer at the moment. Please be assured, we've recorded your query and our committed team is addressing it. As we refine our system, we'll be equipped to answer such questions in the future. We truly value your patience.\n\nWe'd love to invite you to join our lively community at [Website URL]. There, you can help us identify more unanswered questions, or help answer some for the community. As a bonus, you could earn our ecological tokens! Your contribution could greatly impact our services. We'd be thrilled to see you there!"
+            
+        #     res = {
+        #             "question_type": "answer_failed",
+        #             "data": user_message,
+        #             "image_link":""
+        #         }
+
+        #     return res
+
+        res = {
+                "question_type": "chain_info",
+                "data": value,
+                "image_link":""
+            }
         return res
+
 
     except HTTPException as e:
 
@@ -28,6 +58,7 @@ async def analyze_prompt(prompt: str):
         res = {
                 "question_type": "answer_failed",
                 "data": user_message,
+                "image_link":""
             }
 
         return res

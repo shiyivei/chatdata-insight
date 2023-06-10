@@ -13,7 +13,7 @@ sys.path.insert(0, backend_directory)
 from core.config import Config
 from services.binance import binance_api
 from services.news import news_api
-from services.ethereum.ethereum_info import query_ethereum_info
+from services.onchain_info.airstack_and_quicknode import onchain_info_agent
 
 os.environ["OPENAI_API_KEY"] = Config.OPENAI_API_KEY
 
@@ -65,7 +65,7 @@ NEWS_PROMPT = Config.NEWS_PROMPT
 def get_news_prams(x):
 
     # response_schemas = [
-    #     ResponseSchema(name="key_word", description="key_word represents the query parameters extracted from the user input. For example, in the sentence 'What news are there about Bitcoin?', the query parameter would be 'Bitcoin'.")
+    #     ResponseSchema(name="key_word", description=" 'key_word' represents the query parameters extracted from the user input. For example, in the sentence 'What news are there about Bitcoin?', the 'key_word' would be 'Bitcoin'.")
     # ]
     # output_parser = StructuredOutputParser.from_response_schemas(response_schemas)
 
@@ -119,26 +119,30 @@ def get_binance_prams(x):
 
 
 def search_team_info(input: str) -> str:
+    
     return "LDO背后是个大团队"
 
 def analyze_community_activity(input: str) -> str:
     try:
         key_word = get_news_prams(input)
+        
     except Exception as e:
         logger.error("ERROR:    Getting news parameters failed: %s", str(e))
         raise HTTPException(status_code=200, detail=str(e))
 
     # try:
-    #     news = news_api.get_top_headlines(key_word)
+
+    #     # print("key word:",key_word)
+    #     news = news_api.get_top_headlines("Bitcoin")
+
+    #     print("news:",news)
     # except Exception as e:
     #     logger.error("ERROR:    Getting top headlines from news API failed: %s", str(e))
     #     raise HTTPException(status_code=200, detail=str(e))
 
-    res = {
-        "question_type": "news",
-        "data": "There is no big events about bitcoin in recent days",
-    }
 
+    res = "There is no big events about bitcoin in recent days",
+    
     return res
 
 def analyze_solved_needs(intput: str) -> str:
@@ -193,7 +197,11 @@ def search_price_info(intput: str) -> str:
 
 def search_onchain_info(intput: str) -> str:
     try:
-        value = query_ethereum_info(intput)
+        value = onchain_info_agent(intput)
+
+        if value =="Agent stopped due to iteration limit or time limit":
+            return "none"
+
     except Exception as e:
         logger.error("ERROR:    Querying ethereum info failed: %s", str(e))
         raise HTTPException(status_code=200, detail=str(e))
@@ -260,6 +268,11 @@ def task_decomposition(question):
     print("INFO:     DECOMPOSE RESULTS:", result)
 
     return result
+
+
+def search_internet_info(input: str) -> str:
+    
+    return "这是INTERNET上关于LDO的信息"
     
 
 # solution selection
@@ -306,7 +319,7 @@ def solution_selection(question):
         ),
     ]
 
-    agent = initialize_agent(tools, llm, agent="zero-shot-react-description", verbose=True)
+    agent = initialize_agent(tools, llm, agent="zero-shot-react-description",max_iterations=3, verbose=True)
     result = agent.run(question)
 
     print("INFO:     Agent Result:", result)
@@ -377,3 +390,30 @@ def result_integration(origin_question,answer_dict):
         return None
 
     return res
+
+ANSWER_JUDGEMENT_PROMPT = "As a language expert, it is your task to assess whether a given response is valid or an exception. A response is deemed invalid if its meaning aligns closely with 'Agent stopped due to iteration limit or time limit.' However, if it deviates from this scenario, the response is classified as valid."
+
+def check_results(x):
+    response_schemas = [
+        ResponseSchema(name="validity", description="'validity' represents the validity of the answer. When the answer is invalid, the value is 'no'. When the answer is valid, the value is 'yes'."),
+        ResponseSchema(name="question", description="question is the problem itself.")
+    ]
+    output_parser = StructuredOutputParser.from_response_schemas(response_schemas)
+
+    format_instructions = output_parser.get_format_instructions()
+
+    prompt = PromptTemplate(
+        template=JUDGEMENT_PROMPT+"\n{format_instructions}\n{question}",
+        input_variables=["question"],
+        partial_variables={"format_instructions": format_instructions}
+    )
+
+    model = OpenAI(temperature=0)
+
+    _input = prompt.format_prompt(question=x)
+    output = model(_input.to_string())
+    result = output_parser.parse(output)
+
+    print("INFO:   Answer Validity Judge Result:", result)
+
+    return result
