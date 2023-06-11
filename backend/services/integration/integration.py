@@ -20,6 +20,7 @@ from core.config import Config
 from services.binance import binance_api
 from services.news import news_api
 from services.onchain_info.airstack_and_quicknode import onchain_info_agent
+from services.helpers.question_db import ErrorQuestionRecord
 
 os.environ["OPENAI_API_KEY"] = Config.OPENAI_API_KEY
 
@@ -127,7 +128,7 @@ def get_binance_prams(x):
 
 def search_on_internet(question: str) -> str:
 
-    insert_error_data(question, "", "can not find answer")
+    ErrorQuestionRecord.insert_error_data(question, "", "can not find answer")
 
     os.environ["GOOGLE_CSE_ID"] = "6170c8edfbf634caf"
     os.environ["GOOGLE_API_KEY"] = "AIzaSyDnFWoQElznz9N5frGoVsOuNP55xBBV6zM"
