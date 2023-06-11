@@ -367,7 +367,7 @@ def solution_selection(question: str):
         ),
     ]
 
-    agent = initialize_agent(tools, llm, agent="zero-shot-react-description",max_iterations=3, verbose=True)
+    agent = initialize_agent(tools, llm, agent="zero-shot-react-description", verbose=True)
     result = agent.run(question)
 
     
