@@ -32,11 +32,11 @@ class BinanceAPI:
         try:
             start_time = datetime.fromisoformat(time_range[0].strip())
 
-            print("start_time:",start_time)
+            # print("start_time:",start_time)
         
             end_time = datetime.fromisoformat(time_range[1].strip())
 
-            print("end_time:",end_time)
+            # print("end_time:",end_time)
 
         except (ValueError, TypeError, IndexError):
             # Use default values if time_range is invalid or None
@@ -58,6 +58,9 @@ class BinanceAPI:
     
         # Log request information
         logging.info(f'start_timestamp: {start_timestamp}, end_timestamp: {start_timestamp}, symbol: {symbol}, kline_time_interval: {interval}')
+
+
+        print("K线参数:",start_timestamp,end_timestamp,symbol,interval)
 
         try:
             # Make request to API endpoint with specified parameters

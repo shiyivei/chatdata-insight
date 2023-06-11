@@ -1,68 +1,43 @@
-
-from fastapi import APIRouter
-from fastapi import HTTPException
+from fastapi import APIRouter, Response
+from fastapi.responses import StreamingResponse
 from services.integration.integration import chatdata_agent
-from services.integration.integration import check_results
+from services.helpers.chat_models import stream_output
 
+import base64
+import os
+import asyncio
 
 router = APIRouter()
 
+
 @router.get(
-        "/api/integration/request", 
-        response_description="List ethereum data",
-        responses={404: {"description": "Not found"}}
+    "/api/integration/request", 
+    response_description="List ethereum data",
+    responses={404: {"description": "Not found"}}
 )
+def analyze_prompt(prompt: str):
+    value = chatdata_agent(prompt)
 
-async def analyze_prompt(prompt: str):
+    image_path = f'static/image/candlestick_chart.png'
+
+    # 获取图片的URL
+    base_url = 'http://137.184.5.217:3005/'
+    image_url = f'{base_url}{image_path}'
+
+    # 检查文件是否存在
+    if os.path.exists(image_path):
+        # print("文件存在")
+        res = {
+            "question_type": "answer",
+            "data": value,
+            "image_link": image_url
+        }
+    else:
+        res = {
+            "question_type": "answer",
+            "data": value,
+            "image_link": "none"
+        }
+        # print("文件不存在:",image_path)
     
-    try:
-        value = chatdata_agent(prompt)
-
-        # v = check_results(value)
-
-        # if v["validity"] == 'yes':
-
-        #     res = {
-        #         "question_type": "",
-        #         "data": value,
-        #         "image_link":""
-        #     }
-        #     return res
-        # else: 
-
-        #     user_message = "We appreciate your question! Sadly, our system isn't able to provide an answer at the moment. Please be assured, we've recorded your query and our committed team is addressing it. As we refine our system, we'll be equipped to answer such questions in the future. We truly value your patience.\n\nWe'd love to invite you to join our lively community at [Website URL]. There, you can help us identify more unanswered questions, or help answer some for the community. As a bonus, you could earn our ecological tokens! Your contribution could greatly impact our services. We'd be thrilled to see you there!"
-            
-        #     res = {
-        #             "question_type": "answer_failed",
-        #             "data": user_message,
-        #             "image_link":""
-        #         }
-
-        #     return res
-
-        res = {
-                "question_type": "chain_info",
-                "data": value,
-                "image_link":"http://137.184.5.217:3005/static/image/candlestick_chart.png"
-            }
-        return res
-
-
-    except HTTPException as e:
-
-        # store question and error
-        # insert_error_data(prompt,str(e))
-
-        user_message = "We appreciate your question! Sadly, our system isn't able to provide an answer at the moment. Please be assured, we've recorded your query and our committed team is addressing it. As we refine our system, we'll be equipped to answer such questions in the future. We truly value your patience.\n\nWe'd love to invite you to join our lively community at [Website URL]. There, you can help us identify more unanswered questions, or help answer some for the community. As a bonus, you could earn our ecological tokens! Your contribution could greatly impact our services. We'd be thrilled to see you there!"
-        
-        res = {
-                "question_type": "answer_failed",
-                "data": user_message,
-                "image_link":""
-            }
-
-        return res
-
-
-        
-
+    return stream_output(str(res))

@@ -64,9 +64,39 @@ from langchain.schema import (
 
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 
+from langchain.chat_models import ChatOpenAI
+from langchain import PromptTemplate, LLMChain
+from langchain.prompts.chat import (
+    ChatPromptTemplate,
+    SystemMessagePromptTemplate,
+    AIMessagePromptTemplate,
+    HumanMessagePromptTemplate,
+)
+from langchain.schema import (
+    AIMessage,
+    HumanMessage,
+    SystemMessage
+)
+
+answer_example = """
+an answer example is:
+```
+Over the past hour, Bitcoin has seen an open price of 25647.69, a high of 25792.3, a low of 25571.37, and a close of 25727.3. This indicates that Bitcoin has had a relatively stable performance over the past hour.
+
+![Candlestick Chart](http://137.184.5.217:3005/static/image/candlestick_chart.png)
+
+```
+"""
+
 def stream_output(prompt):
+
+    messages = [
+    SystemMessage(content="Assuming you are a question-answering assistant, you now need to read a JSON that contains text content and image links. Sometimes, the image link may be missing. Your task is to organize the text and image links together and output them in Markdown format. If there is no image link, you only need to output the text content without altering it. In addition, there is no need for additional operations like creating headings in Markdown." + answer_example),
+    HumanMessage(content=prompt)
+    ]
          
     chat = ChatOpenAI(streaming=True, callbacks=[StreamingStdOutCallbackHandler()], temperature=0)
-    return chat([HumanMessage(content=prompt)])
+    # chat = ChatOpenAI( callbacks=[StreamingStdOutCallbackHandler()], temperature=0)
+    return chat(messages)
 
     

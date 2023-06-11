@@ -1,6 +1,7 @@
 
 import openai
 import os
+import datetime
 
 import sys
 import json
@@ -8,6 +9,8 @@ from fastapi import HTTPException
 
 import mplfinance as mpf
 import pandas as pd
+import base64
+import plotly.graph_objects as go
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
 backend_directory = os.path.abspath(os.path.join(current_directory,"..",".."))
@@ -127,6 +130,7 @@ def get_binance_prams(x):
 
 
 def search_on_internet(question: str) -> str:
+    remove_histor_image()
 
     ErrorQuestionRecord.insert_error_data(question, "", "can not find answer")
 
@@ -147,6 +151,7 @@ def search_on_internet(question: str) -> str:
     return res
 
 def analyze_community_activity(input: str) -> str:
+    remove_histor_image()
     try:
         key_word = get_news_prams(input)
         
@@ -170,21 +175,27 @@ def analyze_community_activity(input: str) -> str:
     return res
 
 def analyze_solved_needs(intput: str) -> str:
+    remove_histor_image()
     return "LDO是一个去中心化的金融产品"  
 
 def search_token_distribution(intput: str) -> str:
+    remove_histor_image()
     return "现在80%的代币都被社区持有"
 
 def search_inovation(intput: str) -> str:
+    remove_histor_image()
     return "它是一个杠杆金融产品"
 
 def search_economy_model(intput: str) -> str:
+    remove_histor_image()
     return "一部分代币空投给社区，一部分给投资人"
 
 def search_roadmap_and_historical_events(intput: str) -> str:
+    remove_histor_image()
     return "LDO 最近张的很凶"
 
 def search_price_info(intput: str) -> str:
+    remove_histor_image()
     try:
         params = get_binance_prams(intput)
     except Exception as e:
@@ -193,13 +204,17 @@ def search_price_info(intput: str) -> str:
 
     symbol = params["symbol"]
     currency = "USDT"
-    klines = params["k_lines"]
+    # klines = params["k_lines"]
+    klines = "30m"
     dataframe = params["dataframe"]
 
-    print("symbol:", symbol)
-    print("currency:", currency)
-    print("klines:", klines)
-    print("dataframe:", dataframe)
+
+    # dataframe = [datetime.datetime.now() - datetime.timedelta(days=30), datetime.datetime.now()]
+
+    # print("symbol:", symbol)
+    # print("currency:", currency)
+    # print("klines:", klines)
+    # print("dataframe:", dataframe)
     
     try:
         data = binance_api.get_historical_price(symbol, currency, klines, dataframe)
@@ -208,7 +223,7 @@ def search_price_info(intput: str) -> str:
         raise HTTPException(status_code=200, detail=str(e))
 
 
-    print("GET BINANCE DATA:",data)
+    # print("GET BINANCE DATA:",data)
     
     # 将数据转换为DataFrame格式
     df = pd.DataFrame(data)
@@ -226,13 +241,17 @@ def search_price_info(intput: str) -> str:
     df['num_trades'] = df['num_trades'].astype(int)
     df['open_time'] = pd.to_datetime(df['open_time'])
     df.set_index('open_time', inplace=True)
+    
+    image_fullpath = f'static/image/candlestick_chart.png'
+    # mpf.plot(df, type='candle', style='yahoo', volume=True, savefig=image_fullpath)
 
-    # 绘制蜡烛图
-    image_path = 'static/image/candlestick_chart.png'
-    mpf.plot(df, type='candle', style='yahoo', volume=True, savefig=image_path)
+    painting(df)
 
-    # 你需要将下面的 URL 替换成你的应用服务器的地址
-    image_url = f'http://137.184.5.217:3005/{image_path}'
+    # 获取图片的URL
+    base_url = 'http://137.184.5.217:3005/'
+    image_url = f'{base_url}{image_fullpath}'
+
+    
 
     res = {
         "question_type": "binance_data",
@@ -240,13 +259,14 @@ def search_price_info(intput: str) -> str:
         "image_link": image_url
     }
 
-    print("binance data:",res)
+    # print("binance data:",res)
 
-    return
+    return res
 
 
 
 def search_onchain_info(intput: str) -> str:
+    remove_histor_image()
     try:
         value = onchain_info_agent(intput)
 
@@ -320,10 +340,6 @@ def task_decomposition(question):
 
     return result
 
-
-def search_internet_info(input: str) -> str:
-    
-    return "这是INTERNET上关于LDO的信息"
     
 
 # solution selection
@@ -362,7 +378,7 @@ def solution_selection(question: str):
         ),  
 
         Tool(name="Token price", func=search_price_info, 
-            description="useful for  when you need to answer questions about the token price of a specific project, such as price trends, high and low points in the price, and so on"
+            description="useful for  when you need to answer questions about the token price of a specific project, such as price trends, high and low points in the price, and so on, please keep the image_link as return value."
         ),
 
         Tool(name="Onchain information", func= search_onchain_info, 
@@ -372,7 +388,7 @@ def solution_selection(question: str):
 
     agent = initialize_agent(tools, llm, agent="zero-shot-react-description", verbose=True)
     result = agent.run(question)
-
+    
     
 
     print("INFO:     Agent Result:", result)
@@ -470,3 +486,81 @@ def check_results(x):
     print("INFO:   Answer Validity Judge Result:", result)
 
     return result
+
+
+def remove_histor_image():
+
+     # 先删除历史图片
+    image_path = f'static/image/candlestick_chart.png'
+
+    # 如果文件存在，删除它
+    if os.path.exists(image_path):
+        os.remove(image_path)
+        # print("文件已删除")
+    # else:
+        # print("文件不存在:",image_path)
+
+def painting(df):
+    import plotly.graph_objects as go
+
+    fig = go.Figure(data=[go.Candlestick(
+        x=df.index,
+        open=df['open'],
+        high=df['high'],
+        low=df['low'],
+        close=df['close'],
+        increasing_line_color='green',  # 涨时蜡烛颜色为绿色
+        decreasing_line_color='red'     # 跌时蜡烛颜色为红色
+    )])
+
+    fig.update_layout(
+        title={
+            'text': 'Candlestick Chart - Financial Analysis',  # 设置图的标题
+            'y':0.9,
+            'x':0.5,
+            'xanchor': 'center',
+            'yanchor': 'top'},
+        yaxis_title='Price',  # 设置y轴的标题
+        xaxis_title='Date',  # 设置x轴的标题
+        xaxis_rangeslider_visible=False,  # 隐藏范围滑块
+        autosize=False,
+        width=1600,  # 设置图的宽度为1600
+        height=900,  # 设置图的高度为900
+        plot_bgcolor='rgb(34, 34, 34)',  # 设置图背景色为深色
+        paper_bgcolor='rgb(34, 34, 34)',  # 设置画布背景色为深色
+        margin=go.layout.Margin(
+            l=50,  # left margin
+            r=50,  # right margin
+            b=100,  # bottom margin
+            t=100,  # top margin
+            pad=10  # padding
+        )
+    )
+
+    fig.update_layout(
+        title_font_family="Courier",
+        title_font_color="white",  # 标题颜色设为白色以便于在深色背景下阅读
+        title_font_size=30,
+        yaxis=dict(
+            tickfont=dict(
+                family='Courier',
+                color='white',  # y轴标签颜色设为白色以便于在深色背景下阅读
+                size=14
+            ),
+        ),
+        xaxis=dict(
+            tickfont=dict(
+                family='Courier',
+                color='white',  # x轴标签颜色设为白色以便于在深色背景下阅读
+                size=14
+            ),
+        )
+    )
+
+    # Update xaxis and yaxis gridcolor and gridwidth
+    fig.update_xaxes(showgrid=True, gridwidth=1, gridcolor='rgb(68, 68, 68)')  # 更改x轴网格线颜色并调整网格线宽度
+    fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='rgb(68, 68, 68)')  # 更改y轴网格线颜色并调整网格线宽度
+
+    image_fullpath = 'static/image/candlestick_chart.png'
+
+    fig.write_image(image_fullpath)  # 保存图为png文件
